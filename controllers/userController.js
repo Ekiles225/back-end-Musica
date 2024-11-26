@@ -47,6 +47,10 @@ export const createUsers = async (req, res) => {
       }
       //Encrypt user password
      const encryptedPassword = await bcrypt.hash(pasword.toString(),10);
+
+
+     
+
       // Create user in our database
       const users = await userModels.create({
         nombre,

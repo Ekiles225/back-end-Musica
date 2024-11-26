@@ -1,8 +1,7 @@
 import { sequelize } from '../db/conexion.js';
 import { DataTypes } from 'sequelize';
-import { personModels } from './personModels.js';
 
-export const userModels = sequelize.define('Users', {
+export const personModels = sequelize.define('person', {
     // Los atributos del modelo se definen aquí
     id: {
       //tipo de dato
@@ -14,26 +13,30 @@ export const userModels = sequelize.define('Users', {
     },
     nombre: {
       type: DataTypes.STRING, 
-      //no permitir valores nulos
-      allowNull: false 
+      allowNull: true 
     },
     apellido: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: true 
     },
-    correo: {
-        type: DataTypes.STRING
+    direccion: {
+        type: DataTypes.STRING,
+        allowNull: true 
       },
     telefono: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: true
     },
-    pasword: {
-        type: DataTypes.STRING
+    cedula: {
+        type: DataTypes.STRING,
+        allowNull: true 
+    },
+    foto:{
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     // Para desactivar los campos createdAt y updatedAt que sequelize genera por defecto para cada modelo lo desactivamos de la siguiente línea de código
     timestamps: false
     //esto  la tabla usuario 
   });
-
-typuePersonModels.hasMany(personModels, { foreignKey: "personid" });
-UserModel.belongsTo(typuePersonModels, { foreignKey: "personid" });
