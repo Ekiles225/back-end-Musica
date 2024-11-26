@@ -1,32 +1,28 @@
-import  express from 'express';
-const app = express()
-const port = 3000
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { sequelize } from './db/conexion.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import express from 'express';
+import cors from "cors";
+import { PORT } from './config/config.js';
+import { userRouter } from './router/userRouter.js';
+import { sequelize } from "./db/conexion.js";
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+const _PORT = PORT || 3000;
+const app = express();
+app.use(express.json());
+app.use(cors());
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+// app.use('/api', rotuerTypeUsers);
+app.use('/api', userRouter);
 
-//conecccion a mi base de datos con el siguiente metodo
-
-const main= async () =>{
-  try {
-    await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-    app.listen(port, () => {
-      console.log(`Servidor corriendo en el puerto ${port}`)
-    })
-} catch (error) {
-    console.error(`Error ${error}`);
-}
+const main = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log('Base de datos conectada.');
+        await sequelize.sync({ alter: false })
+        app.listen(_PORT, () => {
+            console.log(`Servidor corriendo en el puerto => ${_PORT}`);
+        });
+    } catch (error) {
+        console.log(`Error ${error}`);
+    }
 }
 main();

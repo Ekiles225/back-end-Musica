@@ -1,4 +1,4 @@
-import { UserModel } from "../model/userModels";
+import { userModels } from "../model/userModels.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { TOKEN_KEY } from "../config/config.js";
@@ -7,7 +7,7 @@ import { TOKEN_KEY } from "../config/config.js";
             //funcion para obtener los datos del usuario (TODOS)
 export const getUser = async (req, res) => {
     try {
-      const users = await UserModel.findAll({
+      const users = await userModels.findAll({
         attributes: ['id', 'nombre', 'apellido', 'correo', 'telefono', 'pasword']
       },{where: {state:true}});
     
@@ -20,7 +20,7 @@ export const getUser = async (req, res) => {
                 //funcion para obtener a un usuario 
 export const getOneUser = async (req, res) => {
     try {
-      const user = await UserModel.findOne({where:{id:req.params.id}});
+      const user = await userModels.findOne({where:{id:req.params.id}});
       if(!user){
         res.status(404).json({message: "usuario no encontrado"});
       }
@@ -31,7 +31,8 @@ export const getOneUser = async (req, res) => {
 };
 
 
-                    //crear usuario funcion para aquello 
+//crear usuario funcion para aquello 
+
 export const createUsers = async (req, res) => {
     try {
       const { nombre, apellido, correo, telefono, pasword} = req.body;
@@ -40,14 +41,14 @@ export const createUsers = async (req, res) => {
       }
       // checa si el correo existe 
       // valida si el correo existe en la base de datos 
-      const oldUser = await UserModel.findOne({ where: { correo: correo } });
+      const oldUser = await userModels.findOne({ where: { correo: correo } });
       if (oldUser) {
         return res.status(409).json("correo already exist");
       }
       //Encrypt user password
      const encryptedPassword = await bcrypt.hash(pasword.toString(),10);
       // Create user in our database
-      const users = await UserModel.create({
+      const users = await userModels.create({
         nombre,
         apellido,
         correo: correo.toLowerCase(), // sanitize: convert email to lowercase
@@ -72,7 +73,7 @@ export const updateUsers = async (req, res) => {
     if (!(nombre)) {
       res.status(400).json({ message: "user is required" });
     }
-    const userD = await UserModel.findOne({where:{id:req.params.id}});
+    const userD = await userModels.findOne({where:{id:req.params.id}});
     if(userD){
       userD.set({...userD, nombre:nombre});
         await userD.save();
@@ -87,11 +88,11 @@ export const updateUsersEmail = async (req, res) => {
     if (!(correo)) {
       res.status(400).json({ message: "email is required" });
     }
-    const oldUser = await UserModel.findOne({ where: { correo: correo } });
+    const oldUser = await userModels.findOne({ where: { correo: correo } });
     if (oldUser) {
       return res.status(409).json("email already exist");
     }
-    const userD = await UserModel.findOne({where:{id:req.params.id}});
+    const userD = await userModels.findOne({where:{id:req.params.id}});
     if(userD){
       userD.set({...userD,correo:correo});
         await userD.save();
@@ -108,7 +109,7 @@ export const updateUsersPassword = async (req, res) => {
     if (!(pasword)) {
       res.status(400).json({ message: "password is required" });
     }
-    const userD = await UserModel.findOne({where:{id:req.params.id}});
+    const userD = await userModels.findOne({where:{id:req.params.id}});
     if(userD){
       userD.set({...userD,pasword:pasword});
         await userD.save();
@@ -121,7 +122,7 @@ export const updateUsersPassword = async (req, res) => {
                         //MEtodo para eliminar 
 
 export const deleteUsers = async (req, res) => {
-    const user = await UserModel.findOne({ where: { id: req.params.id } });
+    const user = await userModels.findOne({ where: { id: req.params.id } });
     if (user) {
       user.set({ ...user, state: false });
       await user.save();
@@ -133,40 +134,40 @@ export const deleteUsers = async (req, res) => {
 
                             //loguin 
 
-// export const login = async (req, res) => {
-//     try {
-//       const { email, password } = req.body;
-//       if (!(email && password)) {
-//         res.status(400).json({message:"All input is required"});
-//       }
-//       const user = await UserModel.findOne({
-//         where: { email: email.toLowerCase() },
-//       });
-//        // Check if user exists
-//        if (!user) {
-//         return res.status(401).json({ message: "Invalid credentials" });
-//       }
-//       // Validate password
-//       const isPasswordValid = await bcrypt.compare(password, user.password);
-//       if (!isPasswordValid) {
-//         return res.status(401).json({ message: "Invalid credentials" });
-//       }
-//      // If everything is valid, generate a token
-//       const token = jwt.sign({ user_id: user.id, email }, TOKEN_KEY, {
-//         expiresIn: "1h",
-//       });
-//         let dataUser={
-//             id:user.id,
-//             user:user.user,
-//             email:user.email,
-//             typeusers_id:user.typeusers_id
-//         }
-//         res.status(200).json({ dataUser, token: token });
-//     } catch (err) {
-//       console.error("Login:", err.message );
-//       res.status(500).json({ error: err.message });
-//     }
-// };
+export const login = async (req, res) => {
+    try {
+      const { correo, pasword } = req.body;
+      if (!(correo && pasword)) {
+        res.status(400).json({message:"All input is required"});
+      }
+      const user = await userModels.findOne({
+        where: { correo: correo.toLowerCase() },
+      });
+       // Check if user exists
+       if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      // Validate password
+      const isPasswordValid = await bcrypt.compare(pasword, user.pasword);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+     // If everything is valid, generate a token
+      const token = jwt.sign({ user_id: user.id, correo }, TOKEN_KEY, {
+        expiresIn: "1h",
+      });
+        let dataUser={
+            id:user.id,
+            user:user.user,
+            correo:user.correo,
+            typeusers_id:user.typeusers_id
+        }
+        res.status(200).json({ dataUser, token: token });
+    } catch (err) {
+      console.error("Login:", err.message );
+      res.status(500).json({ error: err.message });
+    }
+};
 
                     //REfresca
 

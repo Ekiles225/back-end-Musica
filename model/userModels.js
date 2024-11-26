@@ -1,7 +1,7 @@
 import { sequelize } from '../db/conexion.js';
 import { DataTypes } from 'sequelize';
 
-export const UserModels = sequelize.define('Users', {
+export const userModels = sequelize.define('Users', {
     // Los atributos del modelo se definen aquí
     id: {
       //tipo de dato
@@ -31,4 +31,5 @@ export const UserModels = sequelize.define('Users', {
   }, {
     // Para desactivar los campos createdAt y updatedAt que sequelize genera por defecto para cada modelo lo desactivamos de la siguiente línea de código
     timestamps: false
+    //esto  la tabla usuario 
   });
