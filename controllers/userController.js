@@ -2,7 +2,7 @@ import { userModels } from "../model/userModels.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { TOKEN_KEY } from "../config/config.js";
-
+import { PersonsModel } from "../model/PersonsModel.js";
 
             //funcion para obtener los datos del usuario (TODOS)
 export const getUser = async (req, res) => {
@@ -18,17 +18,26 @@ export const getUser = async (req, res) => {
 };
 
                 //funcion para obtener a un usuario 
-export const getOneUser = async (req, res) => {
-    try {
-      const user = await userModels.findOne({where:{id:req.params.id}});
-      if(!user){
-        res.status(404).json({message: "usuario no encontrado"});
-      }
-      res.status(200).json({user});
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-};
+                export const getOneUser = async (req, res) => {
+                  try {
+                    const user = await userModels.findOne({
+                      attributes: ['id', 'nombre','apellido','correo', 'telefono','person_id'] ,
+                      where:{id:req.params.id},
+                      include: [
+                        {
+                          model: PersonsModel,
+                        }
+                      ]
+                    });
+                    if(!user){
+                      res.status(404).json({message: "user not found"});
+                    }
+                    res.status(200).json({user});
+                  } catch (error) {
+                    res.status(500).json({ error: error.message });
+                  }
+                  
+                };
 
 
 //crear usuario funcion para aquello 
@@ -47,6 +56,9 @@ export const createUsers = async (req, res) => {
       }
       //Encrypt user password
      const encryptedPassword = await bcrypt.hash(pasword.toString(),10);
+
+     const person = await PersonsModel.create();//esto es lo que agregue
+
       // Create user in our database
       const users = await userModels.create({
         nombre,
@@ -54,6 +66,7 @@ export const createUsers = async (req, res) => {
         correo: correo.toLowerCase(), // sanitize: convert email to lowercase
         telefono,
         pasword: encryptedPassword,
+        person_id:person.id
       });
       // crea el token
       const token = jwt.sign({ user_id: users.id, correo }, TOKEN_KEY, {
