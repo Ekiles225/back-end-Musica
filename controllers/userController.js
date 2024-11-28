@@ -57,7 +57,12 @@ export const createUsers = async (req, res) => {
       //Encrypt user password
      const encryptedPassword = await bcrypt.hash(pasword.toString(),10);
 
+<<<<<<< HEAD
      const person = await PersonsModel.create();//esto es lo que agregue
+=======
+
+     
+>>>>>>> 79e1c5e5330ae5ba3fcbaa20ec0e46bf90dd4153
 
       // Create user in our database
       const users = await userModels.create({

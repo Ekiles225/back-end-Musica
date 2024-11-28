@@ -17,7 +17,7 @@ const main = async () => {
     try {
         await sequelize.authenticate();
         console.log('Base de datos conectada.');
-        await sequelize.sync({ alter: false })
+        await sequelize.sync({ alter: false }) // cambiar a true para que actualice la base de datos y volver a poner en flase
         app.listen(_PORT, () => {
             console.log(`Servidor corriendo en el puerto => ${_PORT}`);
         });
