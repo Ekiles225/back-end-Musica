@@ -7,21 +7,9 @@ export const PersonsModel = sequelize.define("persons",{
             primaryKey:true,
             type: DataTypes.INTEGER,
         },
-        ci: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        nombre:{
+        nombreUsuario:{
             type:DataTypes.STRING,
             allowNull:true,
-        },
-        apellido: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        direccion: {
-            type: DataTypes.STRING,
-            allowNull: true,
         },
         descripcion: {
             type: DataTypes.STRING,

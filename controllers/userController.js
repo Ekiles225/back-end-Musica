@@ -18,72 +18,78 @@ export const getUser = async (req, res) => {
 };
 
                 //funcion para obtener a un usuario 
-                export const getOneUser = async (req, res) => {
-                  try {
-                    const user = await userModels.findOne({
-                      attributes: ['id', 'nombre','apellido','correo', 'telefono','person_id'] ,
-                      where:{id:req.params.id},
-                      include: [
-                        {
-                          model: PersonsModel,
-                        }
-                      ]
-                    });
-                    if(!user){
-                      res.status(404).json({message: "user not found"});
-                    }
-                    res.status(200).json({user});
-                  } catch (error) {
-                    res.status(500).json({ error: error.message });
-                  }
-                  
-                };
+export const getOneUser = async (req, res) => {
+  try {
+    const user = await userModels.findOne({
+      attributes: ['id', 'nombre', 'apellido', 'correo', 'telefono', 'person_id'],
+      where: { id: req.params.id },
+      include: [
+        {
+          model: PersonsModel,
+        }
+      ]
+    });
+    debugger
+    if (!user) {
+      res.status(404).json({ message: "user not found" });
+    }
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+};
 
 
 //crear usuario funcion para aquello 
 
+// Crear usuario con validaciones
 export const createUsers = async (req, res) => {
-    try {
-      const { nombre, apellido, correo, telefono, pasword} = req.body;
-      if (!(nombre ||  apellido ||  correo || telefono || pasword)) {
-        res.status(400).json({ message: "all input is required" });
-      }
-      // checa si el correo existe 
-      // valida si el correo existe en la base de datos 
-      const oldUser = await userModels.findOne({ where: { correo: correo } });
-      if (oldUser) {
-        return res.status(409).json("correo already exist");
-      }
-      //Encrypt user password
-     const encryptedPassword = await bcrypt.hash(pasword.toString(),10);
+  try {
+    const { nombre, apellido, correo, telefono, pasword } = req.body;
 
-<<<<<<< HEAD
-     const person = await PersonsModel.create();//esto es lo que agregue
-=======
-
-     
->>>>>>> 79e1c5e5330ae5ba3fcbaa20ec0e46bf90dd4153
-
-      // Create user in our database
-      const users = await userModels.create({
-        nombre,
-        apellido,
-        correo: correo.toLowerCase(), // sanitize: convert email to lowercase
-        telefono,
-        pasword: encryptedPassword,
-        person_id:person.id
-      });
-      // crea el token
-      const token = jwt.sign({ user_id: users.id, correo }, TOKEN_KEY, {
-        expiresIn: "1h",
-      });
-      // save user token
-      // users.token = token;
-      res.status(201).json({ users, token: token });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    // Validaciones de campos requeridos
+    if (!nombre || !apellido || !correo || !telefono || !pasword) {
+      return res.status(400).json({ message: "All fields are required" });
     }
+
+    // Verificar si el correo ya existe
+    const oldUser = await userModels.findOne({ where: { correo } });
+    if (oldUser) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+
+    // Cifrar contraseña
+    const encryptedPassword = await bcrypt.hash(pasword.toString(), 10);
+
+    // Crear persona asociada (si aplica)
+    const person = await PersonsModel.create({
+      correo, // Solo como ejemplo, ajusta según tus necesidades
+      pasword
+    });
+
+    // Crear usuario
+    const users = await userModels.create({
+      nombre,
+      apellido,
+      correo: correo.toLowerCase(),
+      telefono,
+      pasword: encryptedPassword,
+      person_id: person.id, // Asocia al usuario con la persona
+    });
+
+    // Crear token
+    const token = jwt.sign({ user_id: users.id, correo }, TOKEN_KEY, {
+      expiresIn: "1h",
+    });
+
+    res.status(201).json({ users, token });
+  } catch (error) {
+    console.error("Error in createUsers:", error.message);
+    res.status(500).json({ error: "Internal server error", details: error.message });
+  }
 };
+
 
                     //Metodo para actualizar 
 export const updateUsers = async (req, res) => {
@@ -178,7 +184,7 @@ export const login = async (req, res) => {
             id:user.id,
             user:user.user,
             correo:user.correo,
-            typeusers_id:user.typeusers_id
+            person_id:user.person_id
         }
         res.status(200).json({ dataUser, token: token });
     } catch (err) {
