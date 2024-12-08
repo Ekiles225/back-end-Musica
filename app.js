@@ -4,6 +4,7 @@ import cors from "cors";
 import { PORT } from './config/config.js';
 import { userRouter } from './router/userRouter.js';
 import { sequelize } from "./db/conexion.js";
+import  personrouter  from './router/personRouter.js';
 
 const _PORT = PORT || 3000;
 const app = express();
@@ -12,6 +13,8 @@ app.use(cors());
 
 // app.use('/api', rotuerTypeUsers);
 app.use('/api', userRouter);
+app.use('/api', personrouter);
+
 
 const main = async () => {
     try {
