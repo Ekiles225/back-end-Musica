@@ -44,7 +44,7 @@ export const changeImage = async (req, res) => {
 
         person.set({
           ...person, 
-          foto: file.path
+          foto: file.filename
         });
         
         await person.save()
