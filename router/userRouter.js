@@ -8,6 +8,7 @@ rotuer.get('/user/:id',verifyToken, getOneUser);
 rotuer.post('/register', createUsers);
 rotuer.put('/user/:id',verifyToken, updateUsers);
 rotuer.delete('/user/:id', verifyToken, deleteUsers);
+
 rotuer.post('/login', login);
 rotuer.put('/user/email/:id',verifyToken, updateUsersEmail);
 rotuer.put('/user/password/:id',verifyToken, updateUsersPassword);

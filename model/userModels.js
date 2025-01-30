@@ -1,9 +1,6 @@
 import { sequelize } from '../db/conexion.js';
 import { DataTypes } from 'sequelize';
-
 import { PersonsModel } from "./PersonsModel.js";
-
-
 
 export const userModels = sequelize.define('Users', {
     // Los atributos del modelo se definen aquí
@@ -37,7 +34,6 @@ export const userModels = sequelize.define('Users', {
     timestamps: false
     //esto  la tabla usuario 
   });
-
 
 PersonsModel.hasMany(userModels, { foreignKey: "person_id" });
 userModels.belongsTo(PersonsModel, { foreignKey: "person_id" });

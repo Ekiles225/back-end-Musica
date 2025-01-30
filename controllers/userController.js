@@ -79,10 +79,16 @@ export const createUsers = async (req, res) => {
     });
 
     // Crear token
-    const token = jwt.sign({ user_id: users.id, correo }, TOKEN_KEY, {
-      expiresIn: "1h",
-    });
+    // const token = jwt.sign({ user_id: users.id, correo }, TOKEN_KEY, {
+    //   expiresIn: "1h",
+    // });
+    const token = jwt.sign(
+      { user_id: users.id, correo: users.correo, person_id: person.id },
+      TOKEN_KEY,
+      { expiresIn: "1h" }
+    );
 
+    
     res.status(201).json({ users, token });
   } catch (error) {
     console.error("Error in createUsers:", error.message);
